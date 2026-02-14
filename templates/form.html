@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Medical Symptom Checker</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+  min-height: 100vh;
+  padding: 40px 20px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(138, 43, 226, 0.2) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.98);
+  padding: 60px;
+  border-radius: 24px;
+  box-shadow: 
+    0 30px 90px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  animation: slideIn 0.6s ease-out;
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(10px);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 45px;
+  position: relative;
+}
+
+.icon-container {
+  display: inline-block;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.icon {
+  font-size: 72px;
+  animation: pulse 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 8px 16px rgba(102, 126, 234, 0.3));
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+.icon-bg {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  opacity: 0.1;
+  animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+h2 {
+  color: #1a202c;
+  font-size: 32px;
+  margin-bottom: 12px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  color: #64748b;
+  font-size: 15px;
+  margin-top: 12px;
+  line-height: 1.7;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.form-section {
+  background: #f8fafc;
+  padding: 30px;
+  border-radius: 16px;
+  margin-bottom: 25px;
+  border: 2px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.form-section:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.section-icon {
+  font-size: 28px;
+  margin-right: 12px;
+}
+
+.section-title {
+  color: #1e293b;
+  font-size: 18px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+label {
+  display: flex;
+  align-items: center;
+  color: #334155;
+  font-weight: 600;
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+label::before {
+  content: "•";
+  color: #667eea;
+  font-size: 24px;
+  margin-right: 8px;
+  font-weight: bold;
+}
+
+.helper-text {
+  color: #64748b;
+  font-size: 13px;
+  margin-bottom: 12px;
+  padding-left: 20px;
+  line-height: 1.6;
+  display: flex;
+  align-items: start;
+}
+
+.helper-text::before {
+  content: "ℹ️";
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+textarea {
+  width: 100%;
+  padding: 20px;
+  border: 2px solid #cbd5e1;
+  border-radius: 14px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 15px;
+  color: #1e293b;
+  resize: vertical;
+  transition: all 0.3s ease;
+  line-height: 1.7;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  min-height: 180px;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 
+    0 0 0 4px rgba(102, 126, 234, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+textarea::placeholder {
+  color: #94a3b8;
+}
+
+.char-counter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding: 0 4px;
+}
+
+.char-count {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 4px;
+  background: #e2e8f0;
+  border-radius: 2px;
+  margin: 0 15px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  width: 0%;
+  transition: width 0.3s ease, background 0.3s ease;
+  border-radius: 2px;
+}
+
+.quick-symptoms {
+  margin-top: 15px;
+}
+
+.quick-symptoms-title {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.symptom-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.symptom-tag {
+  padding: 8px 16px;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 20px;
+  font-size: 13px;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.symptom-tag:hover {
+  border-color: #667eea;
+  background: #f0f4ff;
+  color: #667eea;
+  transform: translateY(-2px);
+}
+
+.symptom-tag::before {
+  content: "+";
+  font-weight: bold;
+}
+
+button {
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  box-shadow: 
+    0 8px 20px rgba(102, 126, 234, 0.4),
+    0 0 0 0 rgba(102, 126, 234, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+button:hover {
+  transform: translateY(-3px);
+  box-shadow: 
+    0 12px 28px rgba(102, 126, 234, 0.5),
+    0 0 0 4px rgba(102, 126, 234, 0.2);
+}
+
+button:hover::before {
+  left: 100%;
+}
+
+button:active {
+  transform: translateY(-1px);
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.info-card {
+  background: white;
+  border: 2px solid #e2e8f0;
+  padding: 20px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.info-card:hover {
+  border-color: #667eea;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.info-card-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.info-card h4 {
+  color: #1e293b;
+  font-size: 14px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.info-card ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.info-card li {
+  color: #475569;
+  font-size: 12px;
+  margin: 6px 0;
+  padding-left: 20px;
+  position: relative;
+  line-height: 1.5;
+}
+
+.info-card li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #10b981;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.emergency-banner {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  padding: 18px 24px;
+  border-radius: 12px;
+  margin-top: 25px;
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.emergency-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+  animation: blink 2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.emergency-content h4 {
+  font-size: 15px;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.emergency-content p {
+  font-size: 13px;
+  line-height: 1.5;
+  opacity: 0.95;
+}
+
+.disclaimer {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 12px;
+  margin-top: 30px;
+  padding-top: 25px;
+  border-top: 2px solid #e2e8f0;
+  line-height: 1.6;
+}
+
+.security-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.badge-icon {
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 40px 30px;
+  }
+  
+  h2 {
+    font-size: 26px;
+  }
+  
+  .icon {
+    font-size: 56px;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .symptom-tags {
+    justify-content: center;
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="icon-container">
+      <div class="icon-bg"></div>
+      <div class="icon">🏥</div>
+    </div>
+    <h2>Advanced Medical Symptom Checker</h2>
+    <p class="subtitle">AI-powered diagnostic tool to help identify potential health conditions. Please provide detailed information about your symptoms for accurate results.</p>
+  </div>
+
+  <form action="/predict" method="POST">
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-icon">📝</span>
+        <span class="section-title">Symptom Description</span>
+      </div>
+
+      <div class="form-group">
+        <label for="symptoms">Detailed Symptom Report</label>
+        <p class="helper-text">Provide comprehensive information including onset, duration, intensity, and pattern of symptoms.</p>
+        <textarea 
+          id="symptoms"
+          name="symptoms" 
+          rows="8" 
+          required
+          placeholder="Example: I have been experiencing severe throbbing headache in the frontal region for the past 3 days. The pain intensity is 8/10, worse in the morning. Accompanied by mild fever (100.5°F), body aches, fatigue, and sensitivity to light. No history of similar episodes..."
+          maxlength="1500"
+          oninput="updateCharCounter(this)"></textarea>
+        <div class="char-counter">
+          <span class="char-count"><span id="charCount">0</span> characters</span>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <span class="char-count">1500 max</span>
+        </div>
+      </div>
+
+      <div class="quick-symptoms">
+        <div class="quick-symptoms-title">💡 Quick Add Common Symptoms:</div>
+        <div class="symptom-tags">
+          <span class="symptom-tag" onclick="addSymptom('Fever')">Fever</span>
+          <span class="symptom-tag" onclick="addSymptom('Headache')">Headache</span>
+          <span class="symptom-tag" onclick="addSymptom('Cough')">Cough</span>
+          <span class="symptom-tag" onclick="addSymptom('Body aches')">Body aches</span>
+          <span class="symptom-tag" onclick="addSymptom('Fatigue')">Fatigue</span>
+          <span class="symptom-tag" onclick="addSymptom('Nausea')">Nausea</span>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit">
+      🔍 Generate Medical Prescription
+    </button>
+  </form>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <span class="info-card-icon">⏱️</span>
+      <h4>Time Details</h4>
+      <ul>
+        <li>When did symptoms start?</li>
+        <li>Duration of each symptom</li>
+        <li>Time of day patterns</li>
+      </ul>
+    </div>
+
+    <div class="info-card">
+      <span class="info-card-icon">📊</span>
+      <h4>Severity Scale</h4>
+      <ul>
+        <li>Rate pain 1-10</li>
+        <li>Describe intensity</li>
+        <li>Impact on daily life</li>
+      </ul>
+    </div>
+
+    <div class="info-card">
+      <span class="info-card-icon">🔍</span>
+      <h4>Additional Info</h4>
+      <ul>
+        <li>Triggering factors</li>
+        <li>Relieving factors</li>
+        <li>Associated symptoms</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="emergency-banner">
+    <span class="emergency-icon">🚨</span>
+    <div class="emergency-content">
+      <h4>Emergency Warning</h4>
+      <p>For severe symptoms like chest pain, difficulty breathing, severe bleeding, loss of consciousness, or suspected stroke, call emergency services immediately (911) instead of using this tool.</p>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <p>⚠️ <strong>Medical Disclaimer:</strong> This automated diagnostic system is designed to assist healthcare decision-making but should not replace professional medical advice. Always consult with a qualified healthcare provider for proper diagnosis and treatment.</p>
+    <div class="security-badge">
+      <span class="badge">
+        <span class="badge-icon">🔒</span>
+        Secure & Confidential
+      </span>
+      <span class="badge">
+        <span class="badge-icon">🤖</span>
+        AI-Powered Analysis
+      </span>
+      <span class="badge">
+        <span class="badge-icon">✓</span>
+        HIPAA Compliant
+      </span>
+    </div>
+  </div>
+</div>
+
+<script>
+function updateCharCounter(textarea) {
+  const charCount = document.getElementById('charCount');
+  const progressFill = document.getElementById('progressFill');
+  const length = textarea.value.length;
+  const percentage = (length / 1500) * 100;
+  
+  charCount.textContent = length;
+  progressFill.style.width = percentage + '%';
+  
+  if (percentage > 90) {
+    progressFill.style.background = 'linear-gradient(90deg, #ef4444 0%, #dc2626 100%)';
+  } else if (percentage > 70) {
+    progressFill.style.background = 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)';
+  } else {
+    progressFill.style.background = 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)';
+  }
+}
+
+function addSymptom(symptom) {
+  const textarea = document.getElementById('symptoms');
+  const currentText = textarea.value.trim();
+  
+  if (currentText === '') {
+    textarea.value = symptom;
+  } else {
+    textarea.value = currentText + ', ' + symptom;
+  }
+  
+  updateCharCounter(textarea);
+  textarea.focus();
+}
+</script>
+</body>
+</html>
